@@ -35,8 +35,6 @@
 #define PKGDATA_MODULE_NAME "pygame.pkgdata"
 #define RESOURCE_FUNC_NAME "getResource"
 
-
-
 /*
  * FreeType module declarations
  */
@@ -217,8 +215,6 @@ free_string(PGFT_String *);
                                                                \
         _var = PyObject_IsTrue(_pyobj);                        \
     }
-
-
 
 static PyObject *
 load_font_res(const char *filename)
@@ -2051,8 +2047,8 @@ _ft_get_error(PyObject *self, PyObject *_null)
 static PyObject *
 _ft_get_version(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    return Py_BuildValue("iii",
-        FREETYPE_MAJOR, FREETYPE_MINOR, FREETYPE_PATCH);
+    return Py_BuildValue("iii", FREETYPE_MAJOR, FREETYPE_MINOR,
+                         FREETYPE_PATCH);
 }
 #else
 static PyObject *
@@ -2101,7 +2097,7 @@ _ft_get_version(PyObject *self, PyObject *args, PyObject *kwargs)
                              FREETYPE_PATCH);
     }
 }
-#endif // defined(__EMSCRIPTEN__)
+#endif  // defined(__EMSCRIPTEN__)
 
 static PyObject *
 _ft_get_cache_size(PyObject *self, PyObject *_null)
@@ -2232,16 +2228,17 @@ MODINIT_DEFINE(_freetype)
     FREETYPE_MOD_STATE(_freetypemodule)->resolution = PGFT_DEFAULT_RESOLUTION;
 
     Py_INCREF(&pgFont_Type);
-    if (PyModule_AddObject(_freetypemodule, FONT_TYPE_NAME, (PyObject *)&pgFont_Type)) {
+    if (PyModule_AddObject(_freetypemodule, FONT_TYPE_NAME,
+                           (PyObject *)&pgFont_Type)) {
         Py_DECREF(&pgFont_Type);
         Py_DECREF(_freetypemodule);
         return NULL;
     }
 
-#define DEC_CONST(x)                                        \
+#define DEC_CONST(x)                                                 \
     if (PyModule_AddIntConstant(_freetypemodule, #x, (int)FT_##x)) { \
         Py_DECREF(_freetypemodule);                                  \
-        return NULL;                                        \
+        return NULL;                                                 \
     }
 
     DEC_CONST(STYLE_NORMAL);

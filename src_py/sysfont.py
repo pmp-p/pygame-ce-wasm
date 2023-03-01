@@ -220,7 +220,7 @@ def initsysfonts_unix(path="fc-list"):
 
         # pygbag cache in search order  main script folder, then /tmp
         main = __import__("__main__")
-        if hasattr(main,"__file__"):
+        if hasattr(main, "__file__"):
             fc_cache = Path(main.__file__).parent / "fc_cache"
         else:
             fc_cache = Path(__import__("tempfile").gettempdir()) / "fc_cache"
@@ -230,6 +230,7 @@ def initsysfonts_unix(path="fc-list"):
                 _parse_font_entry_unix(entry, fonts)
         else:
             import warnings
+
             warnings.warn(f"no fc_cache font cache file at {fc_cache}")
 
         for k, v in fonts.items():
@@ -274,7 +275,6 @@ def initsysfonts_unix(path="fc-list"):
                 pass
 
     return fonts
-
 
 
 def _parse_font_entry_unix(entry, fonts):
