@@ -252,10 +252,14 @@ if compile_cython:
             priority = 0
         if outdated:
             print(f'Compiling {pyx_file} because the generated C file is missing.')
-            queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None, 'quiet': False,
-                                         'options': c_options, 'full_module_name': ext.name,
+            try:
+                queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None,
+                                         'quiet': False, 'options': c_options, 'full_module_name': ext.name,
                                          'embedded_metadata': pyx_meta.get(ext.name)}))
-
+            except:
+                queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None,
+                                         cache=None, 'quiet': False, 'options': c_options,
+                                         'full_module_name': ext.name, 'embedded_metadata': pyx_meta.get(ext.name)}))      
     # compile in right order
     queue.sort(key=lambda a: a[0])
     queue = [pair[1] for pair in queue]
