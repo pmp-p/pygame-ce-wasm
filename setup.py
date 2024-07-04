@@ -258,7 +258,7 @@ if compile_cython:
                                          'embedded_metadata': pyx_meta.get(ext.name)}))
             except:
                 queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None,
-                                         cache=None, 'quiet': False, 'options': c_options,
+                                         'cache':None, 'quiet': False, 'options': c_options,
                                          'full_module_name': ext.name, 'embedded_metadata': pyx_meta.get(ext.name)}))      
     # compile in right order
     queue.sort(key=lambda a: a[0])
