@@ -252,14 +252,10 @@ if compile_cython:
             priority = 0
         if outdated:
             print(f'Compiling {pyx_file} because the generated C file is missing.')
-            try:
-                queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None,
-                                         'quiet': False, 'options': c_options, 'full_module_name': ext.name,
+            queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None, 'quiet': False,
+                                         'options': c_options, 'full_module_name': ext.name,
                                          'embedded_metadata': pyx_meta.get(ext.name)}))
-            except:
-                queue.append((priority, {'pyx_file': pyx_file, 'c_file': c_file, 'fingerprint': None,
-                                         'cache':None, 'quiet': False, 'options': c_options,
-                                         'full_module_name': ext.name, 'embedded_metadata': pyx_meta.get(ext.name)}))      
+
     # compile in right order
     queue.sort(key=lambda a: a[0])
     queue = [pair[1] for pair in queue]
@@ -267,8 +263,11 @@ if compile_cython:
     count = len(queue)
     for i, kwargs in enumerate(queue):
         kwargs['progress'] = f'[{i + 1}/{count}] '
-        cythonize_one(**kwargs)
-
+        try:
+            cythonize_one(**kwargs)
+        except TypeError:
+            kwargs['cache'] = None
+            cythonize_one(**kwargs)            
     if cython_only:
         sys.exit(0)
 
