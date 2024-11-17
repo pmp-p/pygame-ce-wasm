@@ -57,12 +57,6 @@ py_dep = py.dependency()
 
 is_pypy = py.get_variable('implementation_lower', '') == 'pypy'
 
-if not cc.has_header('Python.h', dependencies: py_dep)
-    error(
-        'Cannot use `Python.h`. Perhaps you need to install python-dev|python-devel',
-    )
-endif
-
 if get_option('coverage')
     if cc.has_argument('--coverage')
         add_global_arguments('--coverage', language: 'c')
