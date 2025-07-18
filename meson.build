@@ -35,7 +35,7 @@ elif host_machine.system() == 'android'
     )
 elif host_machine.system() == 'emscripten'
     plat = 'emscripten'
-    error(
+    warning(
         'The meson buildconfig of pygame-ce does not support emscripten for now. ',
         'However it may be added in the future',
     )
@@ -229,7 +229,8 @@ if plat == 'win' and host_machine.cpu_family().startswith('x86')
     install_data(dlls, install_dir: pg_dir, install_tag: 'pg-tag')
 
 else
-    bases = ['/usr/local', '/usr', '/opt/homebrew', '/opt/local']
+#    bases = ['/usr/local', '/usr', '/opt/homebrew', '/opt/local']
+    bases = ['/opt/python-wasm-sdk/emsdk/upstream/emscripten/cache/sysroot', '/opt/python-wasm-sdk/devices/emsdk/usr']
     foreach inc_dir : bases
         foreach sub_inc : [
             '',
@@ -311,7 +312,14 @@ if not freetype_dep.found()
     )
 endif
 
+
 portmidi_dep = dependency('portmidi', required: false)
+
+portmidi_deps = []
+
+if get_option('midi').disabled()
+    # disable pypm build
+else
 if not portmidi_dep.found()
     portmidi_dep = declare_dependency(
         include_directories: pg_inc_dirs,
@@ -322,8 +330,6 @@ if not portmidi_dep.found()
         ),
     )
 endif
-
-portmidi_deps = [portmidi_dep]
 
 if portmidi_dep.found()
     # porttime can be a separate library, or be inbuilt in portmidi.
@@ -340,6 +346,7 @@ if portmidi_dep.found()
     if porttime_dep.found()
         portmidi_deps += porttime_dep
     endif
+endif
 endif
 
 pg_base_deps = [sdl_dep, py_dep]
