@@ -34,6 +34,7 @@ COVERAGE_ARGS = ["-Csetup-args=-Dcoverage=true"]
 
 # We assume this script works with any pip version above this.
 PIP_MIN_VERSION = "23.1"
+WASM = __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasm') >= 0
 
 
 class Colors(Enum):
@@ -231,6 +232,18 @@ class Dev:
             f"-Cbuild-dir=.mesonpy-build{build_suffix}",
         ]
 
+        if WASM:
+            stripped = True
+            install_args.append(
+                f'--config-settings=setup-args=--cross-file={os.getcwd()}/meson-python-cross-file.ini'
+            )
+            install_args.append(
+                "-Csetup-args=-Dmidi=disabled",
+            )
+            install_args.append(
+                '-Csetup-args=-Dc_link_args=-lfreetype -lharfbuzz -lSDL2_ttf',
+            )
+            wheel_dir = Path("./whl")
         if not wheel_dir:
             # editable install
             if not quiet:
@@ -261,6 +274,7 @@ class Dev:
         info_str = (
             f"with {debug=}, {lax=}, {sdl3=}, {stripped=}, {coverage=} and {sanitize=}"
         )
+
         if wheel_dir:
             pprint(f"Building wheel at '{wheel_dir}' ({info_str})")
             cmd_run(
@@ -467,6 +481,9 @@ class Dev:
             bin = venv_path / "Scripts" if os.name == "nt" else venv_path / "bin"
             self.py = bin / "python"
         else:
+            if WASM:
+                if os.environ.get('EMSDK', None):
+                    self.py = Path(os.environ.get('SDKROOT') + "/python3-wasm")
             pprint(f"Using python '{self.py}'")
 
         # set PATH to give high priority to executables in the python bin folder
@@ -487,6 +504,12 @@ class Dev:
 
         deps = self.deps.get(self.args["command"], set())
         ignored_deps = self.args["ignore_dep"]
+
+        if WASM:
+            print("IGNORING:", deps)
+            ignored_deps = list(deps)
+            deps.clear()
+
         deps_filtered = deps.copy()
         if ignored_deps:
             for constr in deps:
