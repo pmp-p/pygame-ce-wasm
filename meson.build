@@ -245,7 +245,7 @@ else
     endforeach
 
     foreach lib_dir : bases
-        foreach sub_lib : ['lib', 'lib64']
+        foreach sub_lib : ['lib', 'lib64', 'lib/wasm32-emscripten/pic', 'lib/wasm32-emscripten']
             full_lib = lib_dir / sub_lib
             if fs.exists(full_lib)
                 pg_lib_dirs += full_lib
@@ -300,7 +300,11 @@ if not sdl_ttf_dep.found()
     )
 endif
 
-freetype_dep = dependency('freetype2', required: false)
+if plat == 'emscripten'
+    freetype_dep = dependency('freetype2', required: false)
+else
+    freetype_dep = dependency('freetype2', required: true)
+endif
 if not freetype_dep.found()
     freetype_dep = declare_dependency(
         include_directories: pg_inc_dirs,
@@ -311,6 +315,8 @@ if not freetype_dep.found()
         ),
     )
 endif
+
+
 
 
 portmidi_dep = dependency('portmidi', required: false)

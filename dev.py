@@ -240,6 +240,9 @@ class Dev:
             install_args.append(
                 "-Csetup-args=-Dmidi=disabled",
             )
+            install_args.append(
+                '-Csetup-args=-Dc_link_args=-lfreetype -lharfbuzz -lSDL2_ttf',
+            )
             wheel_dir = Path("./whl")
         if not wheel_dir:
             # editable install
