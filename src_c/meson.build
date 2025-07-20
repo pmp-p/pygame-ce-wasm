@@ -460,4 +460,9 @@ if portmidi_dep.found()
     )
 endif
 
+else # !emscripten
+# TODO: sizes !
+if sdl_api != 3
+subdir('_sdl2')
 endif
+endif # emscripten
