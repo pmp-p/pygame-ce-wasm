@@ -37,10 +37,10 @@ PIP_MIN_VERSION = "23.1"
 
 
 if __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasm') >= 0:
-    if __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasi')>=0:
-        WASM='wasi'
+    if __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasi') >= 0:
+        WASM = 'wasi'
     else:
-        WASM='emscripten'
+        WASM = 'emscripten'
 else:
     WASM = ''
 
@@ -242,11 +242,14 @@ class Dev:
 
         if WASM:
             stripped = True
-            install_args.extend([
-                f'--config-settings=setup-args=--cross-file={os.getcwd()}/meson-cross-{WASM}.ini',
-                "-Csetup-args=-Dmidi=disabled",
-                '-Csetup-args=-Dc_link_args=-Os -g0 -lfreetype -lharfbuzz -lSDL2_ttf -logg -lvorbis -lSDL2_mixer_ogg',
-            ])
+            install_args.extend(
+                [
+                    f'--config-settings=setup-args=--cross-file={os.getcwd()}/meson-cross-{WASM}.ini',
+                    "-Csetup-args=-Dmidi=disabled",
+                    '-Csetup-args=-Dc_args=-Os -g0 -DBUILD_STATIC -DNO_SDL2',
+                    '-Csetup-args=-Dc_link_args=-Os -g0 -lfreetype -lharfbuzz -lSDL2_ttf -logg -lvorbis -lSDL2_mixer_ogg',
+                ]
+            )
             wheel_dir = Path("./whl")
 
         if not wheel_dir:
