@@ -1,5 +1,4 @@
 # first the "required" modules
-
 base = py.extension_module(
     'base',
     'base.c',
@@ -8,6 +7,8 @@ base = py.extension_module(
     install: true,
     subdir: pg,
 )
+
+if host_machine.system() != 'emscripten'
 
 color = py.extension_module(
     'color',
@@ -458,3 +459,10 @@ if portmidi_dep.found()
         subdir: pg,
     )
 endif
+
+else # !emscripten
+# TODO: sizes !
+if sdl_api != 3
+subdir('_sdl2')
+endif
+endif # emscripten
