@@ -1,11 +1,11 @@
 # first the "required" modules
 base = py.extension_module(
-    'pygame_static',
+    'base',
     'base.c',
     c_args: warnings_error,
     dependencies: pg_base_deps,
     install: true,
-#    subdir: pg,
+    subdir: pg,
 )
 
 if host_machine.system() != 'emscripten'

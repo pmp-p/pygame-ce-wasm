@@ -245,7 +245,7 @@ class Dev:
             install_args.extend([
                 f'--config-settings=setup-args=--cross-file={os.getcwd()}/meson-cross-{WASM}.ini',
                 "-Csetup-args=-Dmidi=disabled",
-                '-Csetup-args=-Dc_link_args=-lfreetype -lharfbuzz -lSDL2_ttf',
+                '-Csetup-args=-Dc_link_args=-Os -g0 -lfreetype -lharfbuzz -lSDL2_ttf -logg -lvorbis -lSDL2_mixer_ogg',
             ])
             wheel_dir = Path("./whl")
 
