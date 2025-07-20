@@ -1,13 +1,14 @@
 # first the "required" modules
-
 base = py.extension_module(
-    'base',
+    'pygame_static',
     'base.c',
     c_args: warnings_error,
     dependencies: pg_base_deps,
     install: true,
-    subdir: pg,
+#    subdir: pg,
 )
+
+if host_machine.system() != 'emscripten'
 
 color = py.extension_module(
     'color',
@@ -457,4 +458,6 @@ if portmidi_dep.found()
         install: true,
         subdir: pg,
     )
+endif
+
 endif
