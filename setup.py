@@ -265,8 +265,11 @@ if compile_cython:
     count = len(queue)
     for i, kwargs in enumerate(queue):
         kwargs['progress'] = f'[{i + 1}/{count}] '
-        cythonize_one(**kwargs)
-
+        try:
+            cythonize_one(**kwargs)
+        except TypeError:
+            kwargs['cache'] = None
+            cythonize_one(**kwargs)            
     if cython_only:
         sys.exit(0)
 
