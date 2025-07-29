@@ -36,6 +36,15 @@ COVERAGE_ARGS = ["-Csetup-args=-Dcoverage=true"]
 PIP_MIN_VERSION = "23.1"
 
 
+if __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasm') >= 0:
+    if __import__("sysconfig").get_config_var("HOST_GNU_TYPE").find('wasi') >= 0:
+        WASM = 'wasi'
+    else:
+        WASM = 'emscripten'
+else:
+    WASM = ''
+
+
 class Colors(Enum):
     RESET = "\033[0m"
     RED = "\033[31m"
@@ -231,6 +240,18 @@ class Dev:
             f"-Cbuild-dir=.mesonpy-build{build_suffix}",
         ]
 
+        if WASM:
+            stripped = True
+            install_args.extend(
+                [
+                    f'--config-settings=setup-args=--cross-file={os.getcwd()}/meson-cross-{WASM}.ini',
+                    "-Csetup-args=-Dmidi=disabled",
+                    '-Csetup-args=-Dc_args=-DBUILD_STATIC -DNO_SDL2',
+                    '-Csetup-args=-Dc_link_args=-lfreetype -lharfbuzz -lSDL2_ttf -lSDL2_image -logg -lvorbis -lSDL2_mixer_ogg',
+                ]
+            )
+            wheel_dir = Path("./whl")
+
         if not wheel_dir:
             # editable install
             if not quiet:
@@ -261,6 +282,7 @@ class Dev:
         info_str = (
             f"with {debug=}, {lax=}, {sdl3=}, {stripped=}, {coverage=} and {sanitize=}"
         )
+
         if wheel_dir:
             pprint(f"Building wheel at '{wheel_dir}' ({info_str})")
             cmd_run(
@@ -467,6 +489,9 @@ class Dev:
             bin = venv_path / "Scripts" if os.name == "nt" else venv_path / "bin"
             self.py = bin / "python"
         else:
+            if WASM:
+                if os.environ.get('EMSDK', None):
+                    self.py = Path(os.environ.get('SDKROOT') + "/python3-wasm")
             pprint(f"Using python '{self.py}'")
 
         # set PATH to give high priority to executables in the python bin folder
@@ -487,6 +512,12 @@ class Dev:
 
         deps = self.deps.get(self.args["command"], set())
         ignored_deps = self.args["ignore_dep"]
+
+        if WASM:
+            ignored_deps = list(deps)
+            print("IGNORING:", ignored_deps)
+            deps.clear()
+
         deps_filtered = deps.copy()
         if ignored_deps:
             for constr in deps:
